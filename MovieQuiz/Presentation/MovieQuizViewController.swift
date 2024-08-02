@@ -11,10 +11,10 @@ final class MovieQuizViewController: UIViewController {
     // MARK: - Private Properties
     
     // переменная с индексом текущего вопроса
-    private var currentQuestionIndex = 0
+    private var currentQuestionIndex: Int = .zero
     
     // переменная со счётчиком правильных ответов
-    private var correctAnswers = 0
+    private var correctAnswers: Int = .zero
     
     //Наполняем массив QuizQuestion данными (моки)
     private let questions: [QuizQuestion] = [
@@ -103,26 +103,16 @@ final class MovieQuizViewController: UIViewController {
     // MARK: - IB Actions
     
     @IBAction private func yesButtonClick(_ sender: UIButton) {
-        //Логическая переменная если да - то true, если нет - то false
-        let correctIndex = true
-        
-        if questions[currentQuestionIndex].correctAnswer == correctIndex {
-            showAnswerResult(isCorrect: true)
-        } else {
-            showAnswerResult(isCorrect: false)
-        }
-        
+        // Булевое значение, ответ совпадает ли  с  `true`
+        let answer = questions[currentQuestionIndex].correctAnswer == true
+        // Передаем вычисляемое значение в `showAnswerResult`
+        showAnswerResult(isCorrect: answer)
     }
     
     @IBAction private func noButtonClick(_ sender: UIButton) {
         //Логическая переменная если да - то true, если нет - то false
-        let correctIndex = false
-        
-        if questions[currentQuestionIndex].correctAnswer == correctIndex {
-            showAnswerResult(isCorrect: true)
-        } else {
-            showAnswerResult(isCorrect: false)
-        }
+        let answer = questions[currentQuestionIndex].correctAnswer == false
+        showAnswerResult(isCorrect: answer)
     }
     
     // MARK: - Private Methods
@@ -165,17 +155,13 @@ final class MovieQuizViewController: UIViewController {
     
     // приватный метод, который меняет цвет рамки
     private func showAnswerResult(isCorrect: Bool) {
+        imageView.layer.masksToBounds = true
+        imageView.layer.cornerRadius = 20
+        imageView.layer.borderWidth = 8
+        
+        imageView.layer.borderColor = isCorrect ? UIColor.yPGreen.cgColor : UIColor.yPRed.cgColor
         if isCorrect {
-            imageView.layer.masksToBounds = true // даём разрешение на рисование рамки
-            imageView.layer.borderWidth = 8 // толщина рамки
-            imageView.layer.borderColor = UIColor.yPGreen.cgColor // делаем рамку белой
-            imageView.layer.cornerRadius = 20 // радиус скругления углов рамки
             correctAnswers += 1
-        } else {
-            imageView.layer.masksToBounds = true // даём разрешение на рисование рамки
-            imageView.layer.borderWidth = 8 // толщина рамки
-            imageView.layer.borderColor = UIColor.yPRed.cgColor // делаем рамку белой
-            imageView.layer.cornerRadius = 20 // радиус скругления углов рамки
         }
         //задержка в 1 секунду
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
