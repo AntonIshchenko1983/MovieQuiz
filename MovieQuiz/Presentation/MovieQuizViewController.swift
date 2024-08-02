@@ -8,6 +8,10 @@ final class MovieQuizViewController: UIViewController {
     
     @IBOutlet private weak var counterLabel: UILabel!
     
+    @IBOutlet private weak var yesButton: UIButton!
+    
+    @IBOutlet private weak var noButton: UIButton!
+    
     // MARK: - Private Properties
     
     // переменная с индексом текущего вопроса
@@ -64,12 +68,12 @@ final class MovieQuizViewController: UIViewController {
     
     // для состояния "Результат квиза"
     private struct QuizResultsViewModel {
-      // строка с заголовком алерта
-      let title: String
-      // строка с текстом о количестве набранных очков
-      let text: String
-      // текст для кнопки алерта
-      let buttonText: String
+        // строка с заголовком алерта
+        let title: String
+        // строка с текстом о количестве набранных очков
+        let text: String
+        // текст для кнопки алерта
+        let buttonText: String
     }
     
     // вью модель для состояния "Вопрос показан"
@@ -125,7 +129,7 @@ final class MovieQuizViewController: UIViewController {
                                       preferredStyle: .alert)
         // константа с кнопкой для системного алерта
         let action = UIAlertAction(title: result.buttonText, style: .default) { _ in
-          // код, который сбрасывает игру и показывает первый вопрос
+            // код, который сбрасывает игру и показывает первый вопрос
             self.currentQuestionIndex = 0
             self.correctAnswers = 0
             let currentQuestion = self.questions[self.currentQuestionIndex]
@@ -155,6 +159,8 @@ final class MovieQuizViewController: UIViewController {
     
     // приватный метод, который меняет цвет рамки
     private func showAnswerResult(isCorrect: Bool) {
+        //заблокировали кнопки Да и Нет
+        enableOrDisableButtons()
         imageView.layer.masksToBounds = true
         imageView.layer.cornerRadius = 20
         imageView.layer.borderWidth = 8
@@ -168,12 +174,15 @@ final class MovieQuizViewController: UIViewController {
             self.showNextQuestionOrResults()
             //убрали рамку
             self.imageView.layer.borderWidth = 0
+            //Разблокировали кнопки Да и Нет
+            self.enableOrDisableButtons()
         }
+        
     }
     
     //показываем следующий вопрос или алерт результатов
     private func showNextQuestionOrResults() {
-        if currentQuestionIndex == questions.count - 1 { // 1
+        if currentQuestionIndex == questions.count - 1 {
             // идём в состояние "Результат квиза"
             let text = "Ваш результат: \(correctAnswers)/10"
             let model = QuizResultsViewModel(
@@ -188,6 +197,11 @@ final class MovieQuizViewController: UIViewController {
             show(quiz: convert(model: currentQuestion))
         }
     }
-
-}
     
+    //включаем или отключаем активность кнопок YES и No
+    private func enableOrDisableButtons() {
+        noButton.isEnabled.toggle()
+        yesButton.isEnabled.toggle()
+    }
+}
+
