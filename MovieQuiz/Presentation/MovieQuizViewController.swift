@@ -21,7 +21,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private var questionFactory: QuestionFactoryProtocol?
     //вопрос, который видит пользователь
     private var currentQuestion: QuizQuestion?
-    
+    //связь с AlertPresentor
+    private lazy var alertPresenter = AlertPresenter(viewController: self)
     // переменная с индексом текущего вопроса
     private var currentQuestionIndex: Int = .zero
     // переменная со счётчиком правильных ответов
@@ -33,13 +34,11 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let questionFactory = QuestionFactory() // 2
-            questionFactory.delegate = self         // 3
-            self.questionFactory = questionFactory  // 4
+        let questionFactory = QuestionFactory()
+            questionFactory.delegate = self
+            self.questionFactory = questionFactory
         
-        questionFactory.requestNextQuestion() 
-            
-            
+        questionFactory.requestNextQuestion()
     }
     
     // MARK: - QuestionFactoryDelegate
@@ -84,23 +83,20 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     // приватный метод для показа результатов раунда квиза
     private func show(quiz result: QuizResultsViewModel) {
-        // создаём объекты всплывающего окна
-        let alert = UIAlertController(title: result.title,
-                                      message: result.text,
-                                      preferredStyle: .alert)
-        // константа с кнопкой для системного алерта
-        let action = UIAlertAction(title: result.buttonText, style: .default) { [weak self] _ in
-            guard let self = self else {return}
-            // код, который сбрасывает игру и показывает первый вопрос
+        let alertModel = AlertModel(
+            title: "Этот раунд окончен",
+            message: result.text,
+            buttonText: result.buttonText
+        ) { [weak self] in
+            guard let self = self else { return }
+            
             self.currentQuestionIndex = 0
             self.correctAnswers = 0
             
-            questionFactory?.requestNextQuestion()
+            self.questionFactory?.requestNextQuestion()
         }
-        // добавляем в алерт кнопку
-        alert.addAction(action)
-        // показываем всплывающее окно
-        self.present(alert, animated: true, completion: nil)
+        
+        alertPresenter.showMyAlert(model: alertModel)
     }
     
     // метод конвертации
@@ -155,7 +151,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
                 text: text,
                 buttonText: "Сыграть еще раз")
             show(quiz: model)
-        } else { // 2
+        } else {
             currentQuestionIndex += 1
             // идём в состояние "Вопрос показан"
             questionFactory?.requestNextQuestion() 
